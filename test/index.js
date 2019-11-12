@@ -5,3 +5,10 @@ describe('Test', () => {
         assert.isTrue(true);
     });
 });
+
+
+describe('returnFirstArgument', () => {
+    it('must return same value', ()=>{
+        assert.equal(returnFirstArgument(5), 5);
+    });
+});
