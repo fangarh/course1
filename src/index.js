@@ -1,3 +1,5 @@
-function a(){
-   alert("main");
+function returnFirstArgument(param) {
+    return param;
 }
+
+returnFirstArgument(1);
