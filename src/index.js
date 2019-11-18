@@ -33,12 +33,16 @@ function map(array, fn) {
  Посмотрите как работает reduce и повторите это поведение для массива, который будет передан в параметре array
  */
 function reduce(array, fn, initial) {
-  let res = initial ? initial : array[0];
+  let res;
+  if(initial)
+    res = fn(initial, array[0], 0, array);    
+  else
+    res = array[0];
 
-  for( let i = 0; i < array.length; i ++ ){
-    res = fn(res, array[i], i);
+  for( let i = 1; i < array.length; i ++ ){
+    res = fn(res, array[i], i, array);
   }
-  
+
   return res;
 }
 
@@ -51,6 +55,15 @@ function reduce(array, fn, initial) {
    upperProps({ name: 'Сергей', lastName: 'Петров' }) вернет ['NAME', 'LASTNAME']
  */
 function upperProps(obj) {
+  let result = [];
+
+  for (let prop in obj) {
+    if( obj.hasOwnProperty( prop ) ) {
+      result.push(prop.toUpperCase());
+    } 
+  }
+  
+  return result;
 }
 
 /*
@@ -60,6 +73,18 @@ function upperProps(obj) {
  Посмотрите как работает slice и повторите это поведение для массива, который будет передан в параметре array
  */
 function slice(array, from, to) {
+  let result = [];
+  to = typeof to !== 'undefined' ? to : array.length;
+  from = typeof from !== 'undefined' ? from : 0;
+   
+  if(from < 0)from = (array.length + (from)) < 0 ? 0 : array.length + (from);
+  if(to < 0) to = array.length + to;
+
+  to = to > array.length ? array.length : to;
+
+  for(;from < to; from ++)
+    result.push(array[from]);
+  return result;
 }
 
 /*
@@ -69,6 +94,17 @@ function slice(array, from, to) {
  Proxy должен перехватывать все попытки записи значений свойств и возводить это значение в квадрат
  */
 function createProxy(obj) {
+  return new Proxy(obj,{
+    get(target, phrase) {      
+      return target[phrase];
+    },
+    set(target, phrase, val){
+      if(typeof val == 'number')
+          target[phrase] = val * val;
+      else
+          target[phrase] = val;
+    }
+  });
 }
 
 export {
