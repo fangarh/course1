@@ -34,7 +34,7 @@ function map(array, fn) {
  */
 function reduce(array, fn, initial) {
   let res;
-  if(initial)
+  if(typeof initial !== 'undefined')
     res = fn(initial, array[0], 0, array);    
   else
     res = array[0];
