@@ -16,7 +16,7 @@ function FuncCheck(fn){
 }
 
 function NumberCheck(val){
-  if(typeof val !== "number")
+  if(typeof val === "undefined" || typeof val !== "number")
       throw "number is not a number";
 }
 
@@ -131,7 +131,7 @@ function calculator() {
   const resObj = {
     number:inNumber,
     sum(...args){
-      let number = this.number;
+      let number = this !== null ? (this.number || 0) : 0;
       
       for(let i = 0; i < args.length; i ++){
         NumberCheck(args[i]);
@@ -141,7 +141,7 @@ function calculator() {
       return number;
     },
     dif(...args){
-      let number = this.number;
+      let number = this !== null ? (this.number || 0) : 0;
       
       for(let i = 0; i < args.length; i ++){
         NumberCheck(args[i]);      
@@ -151,7 +151,7 @@ function calculator() {
       return number;
     },   
     mul(...args){
-      let number = this.number;
+      let number = this !== null ? (this.number || 0) : 0;
       
       for(let i = 0; i < args.length; i ++){
         NumberCheck(args[i]);      
@@ -160,10 +160,11 @@ function calculator() {
       
       return number;
     },   
-    div(...args){
-      let number = this.number;
+    div(...args){     
+      let number = this !== null ? (this.number || 0) : 0;
       
       for(let i = 0; i < args.length; i ++){
+
         NumberCheck(args[i]); 
         ZerroCheck(args[i]); 
         number /= args[i];
