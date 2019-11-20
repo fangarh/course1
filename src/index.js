@@ -74,13 +74,10 @@ function upperProps(obj) {
  */
 function slice(array, from, to) {
   let result = [];
-  to = typeof to !== 'undefined' ? to : array.length;
-  from = typeof from !== 'undefined' ? from : 0;
-   
-  if(from < 0)from = (array.length + (from)) < 0 ? 0 : array.length + (from);
-  if(to < 0) to = array.length + to;
-
-  to = to > array.length ? array.length : to;
+ 
+  to = typeof to !== 'undefined' ? (to < 0 ? array.length + to : to) : array.length;
+  
+  from = (from < 0 ?  (array.length + from < 0 ? 0 : array.length + from ) : from) || 0;
 
   for(;from < to; from ++)
     result.push(array[from]);
