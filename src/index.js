@@ -43,15 +43,13 @@ function ZerroCheck(val){
 
 
 function isAllTrue(array, fn) {
-  let res = true;
-
   ArrayCheck(array);
   FuncCheck(fn);
 
   for(let i = 0; i < array.length; i++)
-      res = fn(array[i]) && res;
+      if(fn(array[i]) === false) return false;
 
-  return res;
+  return true;
 }
 
 /*
@@ -161,7 +159,7 @@ function calculator() {
       return number;
     },   
     div(...args){     
-      let number = this !== null ? (this.number || 0) : 0;
+      let number = inNumber;
       
       for(let i = 0; i < args.length; i ++){
 
