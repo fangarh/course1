@@ -1,5 +1,7 @@
 /* ДЗ 3 - работа с исключениями и отладчиком */
-
+import{
+  DevideByZeroException, EmptyArrayException, TypeMistmatchException
+} from '../src/exceptions';
 
 /* 
  * Проверки что параметр нужного типа
@@ -7,22 +9,22 @@
 function ArrayCheck(array)
 {
   if(!(array instanceof Array) || array.length == 0)
-      throw "empty array";
+      throw new EmptyArrayException();
 }
 
 function FuncCheck(fn){
   if(typeof fn !== "function")
-      throw "fn is not a function";
+      throw new TypeMistmatchException("fn is not a function");
 }
 
 function NumberCheck(val){
   if(typeof val === "undefined" || typeof val !== "number")
-      throw "number is not a number";
+      throw new TypeMistmatchException("number is not a number");
 }
 
 function ZerroCheck(val){
   if(val === 0)
-    throw "division by 0";
+    throw new DevideByZeroException();
 }
 /*
  Задание 1:
