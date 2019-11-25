@@ -87,8 +87,8 @@ function findError(where) {
     let result = []; 
 
     for (let child of where.childNodes) {
-        if(child.tagName != null)
-        result.push(child.innerText);
+        if(child.nodeType != Node.TEXT_NODE)
+           result.push(child.innerText);
     }
 
     return result;
@@ -108,7 +108,7 @@ function findError(where) {
  */
 function deleteTextNodes2(where) {
   for (let i =0; i <  where.childNodes.length; i ++) {
-    if(where.childNodes[i].tagName == null){
+    if(where.childNodes[i].nodeType == Node.TEXT_NODE){
          where.removeChild(child);         
     }else
     child.innerText = "";
@@ -118,7 +118,7 @@ function deleteTextNodes2(where) {
 function deleteTextNodes(where){
   var nodes = where.childNodes, rem = [];
   for (let i = 0 ; i < where.childNodes.length; i ++) {
-       if(where.childNodes[i].tagName == null)
+       if(where.childNodes[i].nodeType == Node.TEXT_NODE)
            rem.push(where.childNodes[i]);
        else
            where.childNodes[i].innerText = "";
@@ -175,7 +175,7 @@ function collectDOMStat(root, workData) {
   if(typeof workData == 'undefined')
   workData = {tags : {}, classes : {}, texts : 0}
   for(let node of root.childNodes){
-    if(node.tagName == null){
+    if(node.nodeType == Node.TEXT_NODE){
         workData.texts ++;         
     }else{
         if(typeof workData.tags[node.tagName] == 'undefined')
