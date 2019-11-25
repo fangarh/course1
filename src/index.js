@@ -55,7 +55,7 @@ function findAllPSiblings(where) {
   let result = [];
   for(let node of where.childNodes){
     let next = node.nextSibling;
-    
+
     if(next && next.tagName === 'P')
       result.push(node);
   }
@@ -81,9 +81,10 @@ function findAllPSiblings(where) {
    findError(document.body) // функция должна вернуть массив с элементами 'привет' и 'loftschool'
  */
 function findError(where) {
-    var result = [];
+    let result = [];
 
-    for (var child of where.childNodes) {
+    for (let child of where.childNodes) {
+        if(child.tagName === 'DIV')
         result.push(child.innerText);
     }
 
