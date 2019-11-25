@@ -104,6 +104,13 @@ function findError(where) {
    должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
+  for (var child of where.childNodes) {
+    if(child.tagName == null){
+         where.removeChild(child);
+         continue;
+    }
+    child.innerText = "";
+  }
 }
 
 /*
@@ -118,6 +125,15 @@ function deleteTextNodes(where) {
    должно быть преобразовано в <span><div><b></b></div><p></p></span>
  */
 function deleteTextNodesRecursive(where) {
+  for (var child of where.childNodes) {
+    if(child.tagName == null){
+         where.removeChild(child);
+         continue;
+    }
+  }
+  for (var child of where.childNodes) {
+    deleteTextNodesRecursive(child);
+  }
 }
 
 /*
@@ -140,7 +156,30 @@ function deleteTextNodesRecursive(where) {
      texts: 3
    }
  */
-function collectDOMStat(root) {
+function collectDOMStat(root, workData) {
+    
+  if(typeof workData == 'undefined')
+  workData = {tags : {}, classes : {}, texts : 0}
+  for(let node of root.childNodes){
+    if(node.tagName == null){
+        workData.texts ++;         
+    }else{
+        if(typeof workData.tags[node.tagName] == 'undefined')
+            workData.tags[node.tagName] = 1;
+        else
+            workData.tags[node.tagName] ++;
+        for(let cl of node.className.split(" ")){
+            if(cl.length != 0) {
+            if(typeof workData.classes[cl] == 'undefined')
+                workData.classes[cl] = 1;
+            else
+                workData.classes[cl] ++;
+            }
+        }
+      collectDOMStat(node, workData);
+    }
+  }
+  return workData;
 }
 
 /*
@@ -176,6 +215,25 @@ function collectDOMStat(root) {
    }
  */
 function observeChildNodes(where, fn) {
+  if(typeof fn !== "function")
+      throw new TypeMistmatchException("fn is not a function");
+  let scaner = new MutationObserver(mut=>{changedInDom(mut, fn)});
+  scaner.observe(where, {childList : true, subtree : true});
+}
+
+function changedInDom(inEl, fn){
+  let insert = {type:"insert", nodes:[]}, remove = {type:"remove", nodes:[]};
+  for(let node of inEl){
+       for(let inNode of node.addedNodes)
+           insert.nodes.push(inNode);
+       for(let inNode of node.removedNodes)
+            remove.nodes.push(inNode);
+  }
+  if(insert.nodes.length > 0)
+       fn(insert);
+
+  if(remove.nodes.length > 0)
+       fn(remove);
 }
 
 export {
