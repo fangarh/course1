@@ -168,6 +168,7 @@ function collectDOMStat(root, workData) {
             workData.tags[node.tagName] = 1;
         else
             workData.tags[node.tagName] ++;
+            
         for(let cl of node.className.split(" ")){
             if(cl.length != 0) {
             if(typeof workData.classes[cl] == 'undefined')
