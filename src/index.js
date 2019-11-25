@@ -84,7 +84,7 @@ function findError(where) {
     let result = [];
 
     for (let child of where.childNodes) {
-        if(child.tagName === 'DIV')
+        if(child.tagName != null)
         result.push(child.innerText);
     }
 
@@ -103,16 +103,27 @@ function findError(where) {
    После выполнения функции, дерево <div></div>привет<p></p>loftchool!!!
    должно быть преобразовано в <div></div><p></p>
  */
-function deleteTextNodes(where) {
-  for (var child of where.childNodes) {
-    if(child.tagName == null){
-         where.removeChild(child);
-         continue;
-    }
+function deleteTextNodes2(where) {
+  for (let i =0; i <  where.childNodes.length; i ++) {
+    if(where.childNodes[i].tagName == null){
+         where.removeChild(child);         
+    }else
     child.innerText = "";
   }
 }
 
+function deleteTextNodes(where){
+  var nodes = where.childNodes, rem = [];
+  for (let i = 0 ; i < where.childNodes.length; i ++) {
+       if(where.childNodes[i].tagName == null)
+           rem.push(where.childNodes[i]);
+       else
+           where.childNodes[i].innerText = "";
+  }
+  for (let i = 0 ; i < rem.length; i ++) {
+       where.removeChild(rem[i]);
+  }
+}
 /*
  Задание 6:
 
@@ -168,7 +179,7 @@ function collectDOMStat(root, workData) {
             workData.tags[node.tagName] = 1;
         else
             workData.tags[node.tagName] ++;
-            
+
         for(let cl of node.className.split(" ")){
             if(cl.length != 0) {
             if(typeof workData.classes[cl] == 'undefined')
