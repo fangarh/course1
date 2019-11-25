@@ -29,7 +29,10 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
-
+  if(where.childNodes.length != 0)
+      where.insertBefore(what, where.childNodes[0]);
+  else
+      where.appendChild(what);
 }
 
 /*
