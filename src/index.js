@@ -140,7 +140,7 @@ function deleteTextNodes(where){
  */
 function deleteTextNodesRecursive(where) {
   for (var child of where.childNodes) {
-    if(child.tagName == null){
+    if(child.nodeType == Node.TEXT_NODE){
          where.removeChild(child);
          continue;
     }
