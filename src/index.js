@@ -15,6 +15,9 @@ import{
    createDivWithText('loftschool') // создаст элемент div, поместит в него 'loftschool' и вернет созданный элемент
  */
 function createDivWithText(text) {
+  let newElm = document.createElement("div");
+  newElm.innerText = text;
+  return newElm;
 }
 
 /*
@@ -26,6 +29,7 @@ function createDivWithText(text) {
    prepend(document.querySelector('#one'), document.querySelector('#two')) // добавит элемент переданный первым аргументом в начало элемента переданного вторым аргументом
  */
 function prepend(what, where) {
+
 }
 
 /*
@@ -47,8 +51,17 @@ function prepend(what, where) {
 
    findAllPSiblings(document.body) // функция должна вернуть массив с элементами div и span т.к. следующим соседом этих элементов является элемент с тегом P
  */
-function findAllPSiblings(where) {
+function findAllPSiblings(where) {  
+  let result = [];
+  for(let node of where.childNodes){
+    let next = node.nextSibling;
+    
+    if(next && next.tagName === 'P')
+      result.push(node);
+  }
+  return result;
 }
+
 
 /*
  Задание 4:
