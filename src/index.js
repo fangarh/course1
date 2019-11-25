@@ -81,7 +81,7 @@ function findAllPSiblings(where) {
    findError(document.body) // функция должна вернуть массив с элементами 'привет' и 'loftschool'
  */
 function findError(where) {
-    let result = [];
+    let result = []; 
 
     for (let child of where.childNodes) {
         if(child.tagName != null)
