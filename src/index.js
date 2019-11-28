@@ -62,7 +62,7 @@ function emulateClick(target) {
    delegate(document.body, () => console.log('кликнули на button')) // добавит такой обработчик кликов для body, который будет вызывать указанную функцию только если кликнули на кнопку (элемент с тегом button)
  */
 function delegate(target, fn) {
-document.addEventListener(target, fn);
+    target.querySelectorAll('button').forEach(e => e.addEventListener('click', fn));
 }
 
 /*
@@ -75,6 +75,12 @@ document.addEventListener(target, fn);
    once(document.querySelector('button'), () => console.log('обработчик выполнился!')) // добавит такой обработчик кликов для указанного элемента, который вызовется только один раз и затем удалится
  */
 function once(target, fn) {
+  let eventCallback = () => {
+    fn();
+    target.removeEventListener('click', eventCallback);
+  }
+  
+  target.addEventListener('click', eventCallback );
 }
 
 export {

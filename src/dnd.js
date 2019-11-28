@@ -27,6 +27,16 @@ const homeworkContainer = document.querySelector('#homework-container');
    homeworkContainer.appendChild(newDiv);
  */
 function createDiv() {
+  let mydiv = document.createElement('DIV');
+  mydiv.id = 'addDiv';
+  mydiv.classList.add('draggable-div');
+  mydiv.style.backgroundColor = 'red';
+  mydiv.style.width = '30px';
+  mydiv.style.height = '20px';
+  mydiv.style.right = '20px';
+  mydiv.style.left = '15px';
+  mydiv.style.top = '35px';
+  return mydiv;
 }
 
 /*
