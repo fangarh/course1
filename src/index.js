@@ -64,7 +64,7 @@ function emulateClick(target) {
 function delegate(target, fn) {
     target.querySelectorAll('button').forEach(e => e.addEventListener('click', fn));
 }
-
+ 
 /*
  Задание 6:
 
