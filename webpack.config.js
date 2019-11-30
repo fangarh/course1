@@ -1,21 +1,26 @@
-let webpack = require('webpack');
 let HtmlPlugin = require('html-webpack-plugin');
 let CleanWebpackPlugin = require('clean-webpack-plugin');
-let ExtractTextPlugin = require('extract-text-webpack-plugin');
-let rules = require('./webpack.config.rules')();
+let MiniCSSExtractPlugin = require('mini-css-extract-plugin');
+let UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+let rules = require('./webpack.config.rules');
 let path = require('path');
 
 rules.push({
     test: /\.css$/,
-    use: ExtractTextPlugin.extract({
-        fallback: 'style-loader',
-        use: 'css-loader'
-    })
+    use: [
+        MiniCSSExtractPlugin.loader,
+        {
+            loader: 'style-loader' 
+        },
+        {
+            loader: 'css-loader' 
+        }
+    ]
 });
 
 module.exports = {
     entry: {
-        main: './src/index.js',
+        index: './src/index.js',
         dnd: './src/dnd.js'
     },
     devServer: {
@@ -28,18 +33,20 @@ module.exports = {
     devtool: 'source-map',
     module: { rules },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
+        new UglifyJsPlugin({
             sourceMap: true,
-            compress: {
-                drop_debugger: false,
-                warnings: false
+            uglifyOptions: {
+                compress: {
+                    drop_debugger: false
+                }
             }
         }),
-        new ExtractTextPlugin('styles.css'),
+        new MiniCSSExtractPlugin('styles.css'),
         new HtmlPlugin({
             title: 'Main Homework',
-            template: 'main.hbs',
-            chunks: ['main']
+            template: 'index.hbs',
+            filename: 'index.html',
+            chunks: ['index']
         }),
         new HtmlPlugin({
             title: 'Div Drag And Drop',
