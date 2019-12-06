@@ -37,7 +37,29 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
+  return new Promise((resolve, rej) => {
+
+    const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
+    
+    fetch(url).then( response => response.json())
+        .then(fetchRes => resolve((fetchRes).sort((e1,e2)=>stringSort(e1.name, e2.name))))
+        .catch(e=>rej(e));
+    });
 }
+
+
+function stringSort(a, b){
+  if (a > b) {
+      return 1;
+  }
+  
+  if (a < b) {
+      return -1;
+  }
+
+  return 0;
+}
+
 
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
@@ -51,6 +73,7 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
+  return full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1;
 }
 
 /* Блок с надписью "Загрузка" */
@@ -62,8 +85,9 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-filterInput.addEventListener('keyup', function() {
+filterInput.addEventListener('keyup', function(e) {
     // это обработчик нажатия кливиш в текстовом поле
+
 });
 
 export {

@@ -28,23 +28,20 @@ function delayPromise(seconds) {
 
  Пример:
    loadAndSortTowns().then(towns => console.log(towns)) // должна вывести в консоль отсортированный массив городов
- */
+ */ 
 function loadAndSortTowns() {
   return new Promise((resolve, rej) => {
 
     const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
     
     fetch(url).then( response => response.json())
-        .then(fetchRes => resolve((fetchRes).sort((e1,e2)=>stringSortsort(e1.name, e2.name))))
+        .then(fetchRes => resolve((fetchRes).sort((e1,e2)=>stringSort(e1.name, e2.name))))
         .catch(e=>rej(e));
-
-    //fetch(url).then( response => response.json() ).then(fetchRes => resolve([...fetchRes])).catch(e=>{throw e});
-
-        });
+    });
     
 }
 
-function stringSortsort(a, b){
+function stringSort(a, b){
   if (a > b) {
       return 1;
   }
