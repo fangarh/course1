@@ -21,10 +21,10 @@ rules.push({
 module.exports = {
     entry: {
         index: './src/index.js',
-        dnd: './src/dnd.js'
+        dnd: './src/towns.js'
     },
     devServer: {
-        index: 'dnd.html'
+        index: 'towns.html'
     },
     output: {
         filename: '[name].[hash].js',
@@ -50,9 +50,9 @@ module.exports = {
         }),
         new HtmlPlugin({
             title: 'Div Drag And Drop',
-            template: 'dnd.hbs',
-            filename: 'dnd.html',
-            chunks: ['dnd']
+            template: 'towns-content.hbs',
+            filename: 'towns-content.html',
+            chunks: ['towns-content']
         }),
         new CleanWebpackPlugin(['dist'])
     ]
