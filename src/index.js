@@ -34,7 +34,9 @@ function loadAndSortTowns() {
 
     const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
     
-    fetch(url).then( response => response.json()).then(fetchRes => resolve(Array.from(fetchRes).sort((e1,e2)=>stringSortsort(e1.name, e2.name)))).catch(e=>rej(e));
+    fetch(url).then( response => response.json())
+        .then(fetchRes => resolve((fetchRes).sort((e1,e2)=>stringSortsort(e1.name, e2.name))))
+        .catch(e=>rej(e));
 
     //fetch(url).then( response => response.json() ).then(fetchRes => resolve([...fetchRes])).catch(e=>{throw e});
 
