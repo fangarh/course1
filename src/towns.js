@@ -42,7 +42,7 @@ function loadTowns() {
     const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
     
     fetch(url).then( response => response.json())
-        .then(fetchRes => resolve((fetchRes).sort((e1,e2)=>stringSort(e1.name, e2.name))))
+        .then(fetchRes => resolve((fetchRes).sort((e1, e2)=>stringSort(e1.name, e2.name))))
         .catch(e=>rej(e));
     });
 }
@@ -87,7 +87,8 @@ const filterResult = homeworkContainer.querySelector('#filter-result');
 
 filterInput.addEventListener('keyup', function(e) {
     // это обработчик нажатия кливиш в текстовом поле
-
+    console.log(e);
+    alert(1);
 });
 
 export {
