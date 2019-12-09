@@ -64,7 +64,7 @@ function fillTable(filter){
   listTable.innerHTML = '';
 
   for (let cookie in cookiesSet){
-    if(isMatching(cookiesSet[cookie], filter) || isMatching(cookie, filter)){
+
       let row = document.createElement('TR');
       let cName = document.createElement('TD');
       let cValue = document.createElement('TD');
@@ -88,7 +88,7 @@ function fillTable(filter){
       
       listTable.appendChild(row);
     }
-  }
+
 }
 
 addButton.addEventListener('click', () => {
@@ -106,7 +106,8 @@ function isMatching(full, chunk) {
 }
 
 function getAllCookie() {
-  var pairs = document.cookie.split(';').reduce((prev, current) => {
+  let search = filterNameInput.value;
+  var pairs = document.cookie.split(';').filter(e=>isMatching(e,search)).reduce((prev, current) => {
     const [name, value] = current.split('=');
     prev[name] = value;
     return prev;
@@ -116,4 +117,4 @@ function getAllCookie() {
 
 function deleteCookie(name){
   document.cookie = `${name}=""; max-age=-1`;
-}
+} 
