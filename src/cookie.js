@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+/* eslint-disable space-before-blocks */
 /*
  ДЗ 7 - Создать редактор cookie с возможностью фильтрации
 
@@ -43,11 +45,75 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function() {
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+filterNameInput.addEventListener('keyup', function () {
+  let search = filterNameInput.value;
+  
+  fillTable(search);
 });
-alert("2");
+document.addEventListener('DOMContentLoaded', ()=>{fillTable("")});
+
+function clearAllCookie(){
+  let cookiesSet = getAllCookie();
+
+  for (let cookie in cookiesSet)
+     deleteCookie(cookie);
+}
+
+function fillTable(filter){
+  let cookiesSet = getAllCookie();
+  listTable.innerHTML = '';
+
+  for (let cookie in cookiesSet){
+    if(isMatching(cookiesSet[cookie], filter) || isMatching(cookie, filter)){
+      let row = document.createElement('TR');
+      let cName = document.createElement('TD');
+      let cValue = document.createElement('TD');
+      let cDel = document.createElement('TD');
+      let delButton = document.createElement('BUTTON');
+
+      cName.innerText = cookie;
+      cValue.innerText = cookiesSet[cookie];
+      delButton.innerText = 'Удалить';
+      cDel.appendChild(delButton);
+
+      delButton.onclick = ()=>{
+          deleteCookie(cookie);
+          listTable.removeChild(row);
+
+      };
+
+      row.appendChild(cName);
+      row.appendChild(cValue);
+      row.appendChild(cDel);
+      
+      listTable.appendChild(row);
+    }
+  }
+}
+
 addButton.addEventListener('click', () => {
-    // здесь можно обработать нажатие на кнопку "добавить cookie"
-    alert("1");
+  // здесь можно обработать нажатие на кнопку "добавить cookie"
+
+  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+
+  let search = filterNameInput.value;
+
+  fillTable(search);
 });
+
+function isMatching(full, chunk) {
+  return full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1;
+}
+
+function getAllCookie() {
+  var pairs = document.cookie.split(';').reduce((prev, current) => {
+    const [name, value] = current.split('=');
+    prev[name] = value;
+    return prev;
+  }, {});
+  return pairs;
+}
+
+function deleteCookie(name){
+  document.cookie = `${name}=""; max-age=-1`;
+}
