@@ -36,11 +36,11 @@ const homeworkContainer = document.querySelector('#homework-container');
  Массив городов пожно получить отправив асинхронный запрос по адресу
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
+
+ const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
+
 function loadTowns() {
   return new Promise((resolve, rej) => {
-
-    const url = "https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json";
-    
     fetch(url).then( response => response.json())
         .then(fetchRes => resolve((fetchRes).sort((e1, e2)=>stringSort(e1.name, e2.name))))
         .catch(e=>rej(e));
@@ -85,10 +85,50 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
+const errorBlock = homeworkContainer.querySelector('#error-block');
+const errorButton = homeworkContainer.querySelector('#reloadOnError');
+
+let townsList = [];
+
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  errorButton.onclick = () => {
+    loadingBlock.style.display = "block";
+    filterBlock.style.display = "none";
+    errorBlock.style.display = "none";
+    initData();
+  }
+
+  initData();
+});
+
+function initData(){
+    loadTowns().then(townsLoaded, loadError);
+}
+
+function loadError(){
+  loadingBlock.style.display = "none";
+  filterBlock.style.display = "none";
+  errorBlock.style.display = "block";
+}
+
+function townsLoaded(towns){
+    townsList = towns;
+    filterBlock.style.display = "block";
+    loadingBlock.style.display = "none";
+}
+
 filterInput.addEventListener('keyup', function(e) {
-    // это обработчик нажатия кливиш в текстовом поле
-    console.log(e);
-    alert(1);
+    // это обработчик нажатия кливиш в текстовом поле    
+    filterResult.innerHTML = "";
+
+    if(!filterInput.value)return;
+
+    for(let town of townsList){
+      if(isMatching(town.name, filterInput.value)){
+          filterResult.innerHTML += town.name + "<br/>";
+      }
+    }
 });
 
 export {

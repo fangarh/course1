@@ -1,6 +1,11 @@
-<div id="loading-block">Загрузка..1.</div>
-<div id="filter-block" style="display: block;">
+<div id="loading-block">Загрузка...</div>
+<div id="filter-block" style="display: none;">
   <input type="text" placeholder="название города" id="filter-input">
 
   <div id="filter-result"></div>
+</div>
+<div id="error-block" style="display: none;">
+  <label style="color: red;"> Ошибка загрузки </label>
+
+  <button id="reloadOnError"> Повторить </button>
 </div>

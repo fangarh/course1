@@ -1,59 +1,74 @@
-let HtmlPlugin = require('html-webpack-plugin');
-let CleanWebpackPlugin = require('clean-webpack-plugin');
-let MiniCSSExtractPlugin = require('mini-css-extract-plugin');
-let UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-let rules = require('./webpack.config.rules');
-let path = require('path');
+const HtmlPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const rules = require('./webpack.config.rules');
+const fs = require('fs');
+const path = require('path');
 
-rules.push({
-    test: /\.css$/,
-    use: [
-        MiniCSSExtractPlugin.loader,
-        {
-            loader: 'style-loader' 
-        },
-        {
-            loader: 'css-loader' 
+const root = path.resolve('src');
+const files = fs.readdirSync(root)
+    .reduce((all, current) => {
+        const ext = path.extname(current);
+        const name = path.basename(current, ext);
+        const absPath = path.join(root, current);
+
+        if (!all.hasOwnProperty(ext)) {
+            all[ext] = [];
         }
-    ]
-});
+
+        all[ext].push({ name, absPath });
+
+        return all;
+    }, { '.js': [], '.hbs': [] });
+const entries = files['.js'].reduce((all, { name, absPath }) => {
+    all[name] = absPath;
+
+    return all;
+}, {});
+const html = files['.hbs']
+    .filter(file => entries.hasOwnProperty(file.name))
+    .map((file) => {
+        return new HtmlPlugin({
+            title: file.name,
+            template: file.absPath,
+            filename: `${file.name}.html`,
+            chunks: [file.name]
+        });
+    });
+
+if (!html.length || !files['.hbs'].find(file => file.name === 'index')) {
+    html.push(new HtmlPlugin({
+        title: 'index',
+        template: 'index.hbs',
+        chunks: ['index']
+    }));
+}
 
 module.exports = {
-    entry: {
-        index: './src/towns.js',
-        dnd: './src/towns.js'
-    },
-    devServer: {
-        index: './src/towns.html'
-    },
+    entry: entries,
     output: {
         filename: '[name].[hash].js',
         path: path.resolve('dist')
     },
+    mode: 'development',
     devtool: 'source-map',
-    module: { rules },
-    plugins: [
-        new UglifyJsPlugin({
-            sourceMap: true,
-            uglifyOptions: {
-                compress: {
-                    drop_debugger: false
-                }
+    module: {
+        rules: [
+            ...rules,
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ]
             }
+        ]
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
         }),
-        new MiniCSSExtractPlugin('styles.css'),
-        new HtmlPlugin({
-            title: 'Main Homework',
-            template: './src/towns.hbs',
-            filename: './src/towns.html',
-            chunks: ['towns']
-        }),
-        new HtmlPlugin({
-            title: 'Div Drag And Drop',
-            template: './src/towns-content.hbs',
-            filename: './src/towns-content.html',
-            chunks: ['towns-content']
-        }),
+        ...html,
         new CleanWebpackPlugin(['dist'])
     ]
 };
