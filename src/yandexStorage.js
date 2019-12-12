@@ -8,14 +8,10 @@ class YandexStorage {
         this.objectManager = objectManager;
         loadFromStorage();
 
-        console.log(storage);
-
         for (let [key, place] of storage) {
             let history = place;
             let address = key;
             let coords = place[0].coords;
-
-            console.log(place);
 
             let yeb = new yandexElementBuilder(this.objectManager, coords, address, history, this.AppendComment);
 
@@ -34,7 +30,7 @@ class YandexStorage {
     AppendComment(elm) {
         if (storage.has(elm.address)) {
             let arr = storage.get(elm.address);
-            
+
             arr.push(elm);
             storage.set(elm.address, arr);
         } else {
@@ -57,12 +53,7 @@ function loadFromStorage( ) {
 }
 
 function saveToStorage( ) {
-    console.log("save");
-    console.log(JSON.stringify(Array.from(storage.entries())));
-
     localStorage.course1 = JSON.stringify(Array.from(storage.entries()));
-
-    console.log("saved");
 }
 
 export { YandexStorage };
