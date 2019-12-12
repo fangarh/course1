@@ -5,6 +5,7 @@ class UserComment {
         this.place = place ? place : '';
         this.comment = comment ? comment : '';
         this.address = address ? address : '';
+        this.coords = undefined;
     }
 
     CurDate() {
@@ -30,6 +31,10 @@ class UserComment {
         return this.address;
     }
 
+    get Coords() {
+        return this.coords;
+    }
+
     set Name(val) {
         this.name = val;
     }
@@ -40,6 +45,10 @@ class UserComment {
 
     set Comment(comment) {
         this.comment = comment;
+    }
+
+    set Coords(val) {
+        this.coords = val;
     }
 
     set Addres(val) {

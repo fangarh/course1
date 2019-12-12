@@ -27,7 +27,7 @@ function init() {
 
     map.geoObjects.add(cluster);
 
-    storage = new YandexStorage(map, cluster);
+    storage = new YandexStorage(cluster);
 
     map.events.add('click', (e)=>{
         getAddress(e.get('coords'), m=>storage.AddObject( e.get('coords'), m ));

@@ -1,16 +1,18 @@
 import { UserComment } from './userComment';
 
 class yandexElementBuilder {
-    constructor(currentMap, objectManager, geoCoord, address, placeHistory) {
+    constructor(objectManager, geoCoord, address, placeHistory, commentAddedCallback) {
         this.geoCoord = geoCoord;
         this.saved = false;
         this.address = address;
         this.history = placeHistory;
-        this.map = currentMap;
+
         this.objectManager = objectManager;
         this.balloonLayout = '';
         this.contentLayout = '';
         this.placemark = null;
+        this.isNew = true;
+        this.commentAdded = commentAddedCallback;
     }
 
     ClosedWithoutSave(balloon) {
@@ -21,7 +23,10 @@ class yandexElementBuilder {
         });
     }
 
-    BuildPlaceMark() {
+    SetOldPlacemark(){
+        this.isNew = false;
+        this.saved = true;
+
         this.ReCreateLayout();
 
         this.placemark = new ymaps.Placemark ( this.geoCoord, {
@@ -33,20 +38,130 @@ class yandexElementBuilder {
         } );
 
         this.objectManager.add(this.placemark);
-        this.placemark.balloon.open(this.geoCoord);
 
-        this.placemark.balloon.events.add('close', ()=>{
-            console.log(this.saved);
+        this.placemark.balloon.events.add('close', ()=> {
+            this.CloseCallback.call(this);
         });
+    }
+
+    BuildPlaceMark( old ) {
+        this.ReCreateLayout();
+
+        this.placemark = new ymaps.Placemark ( this.geoCoord, {
+            balloonHeader: this.address,
+        }, {
+            balloonShadow: false,
+            balloonLayout: this.balloonLayout,
+            balloonContentLayout: this.contentLayout
+        } );
+
+        this.objectManager.add(this.placemark);
+
+        if (old) {
+            this.isNew = false;
+            this.saved = true;
+        } else {
+            this.placemark.balloon.open(this.geoCoord);
+        }
+
+        this.placemark.balloon.events.add('close', ()=> {
+            this.CloseCallback.call(this);
+        });
+    }
+
+    CloseCallback() {
+        if (this.saved) {
+            this.objectManager.remove(this.placemark);
+
+            this.ReCreateLayout();
+
+            this.placemark = new ymaps.Placemark ( this.geoCoord, {
+                balloonHeader: this.address,
+            }, {
+                balloonShadow: false,
+                balloonLayout: this.balloonLayout,
+                balloonContentLayout: this.contentLayout
+            } );
+
+            // eslint-disable-next-line consistent-this
+            this.placemark.balloon.events.add('close', ()=>{
+                this.CloseCallback.call(this);
+            });
+
+            this.objectManager.add(this.placemark);
+            this.isNew = false;
+            this.saved = false;
+        }else{
+            if(this.isNew){
+                this.objectManager.remove(this.placemark);
+            }
+        }
+    }
+
+    BuildBalloonHtml(){
+        let body = document.createElement('DIV');
+        let list = document.createElement('DIV');
+
+        list.style.minHeight = '100px';
+        list.style.maxHeight = '180px';
+        list.style.overflowY = 'auto';
+
+        for (let comment of this.history) {
+            let record = document.createElement('DIV');
+
+            record.innerHTML = '<b>' + comment.name + '</b> ' + comment.place + ' ' + comment.date + '<br/>';
+
+            record.appendChild(document.createTextNode(comment.comment));
+            list.appendChild(record);
+        }
+
+        body.appendChild(list);
+
+        let editForm = document.createElement('DIV');
+
+        editForm.innerHTML = '<h5 style="color: #C21F39">Ваш отзыв:</h5>';
+
+        let nameInput = document.createElement('INPUT');
+
+        nameInput.id = 'nameInput';
+        nameInput.placeholder = 'Ваше имя';
+        nameInput.type = 'text';
+        editForm.appendChild(nameInput);
+
+        let placeInput = document.createElement('INPUT');
+
+        placeInput.id = 'placeInput';
+        placeInput.placeholder = 'Укажите место';
+        placeInput.type = 'text';
+        editForm.appendChild(placeInput);
+
+        let commentInput = document.createElement('TEXTAREA');
+
+        commentInput.id = 'commentInput';
+        commentInput.placeholder = 'Поделитесь впечатлениями';
+        editForm.appendChild(commentInput);
+
+        let submitButton = document.createElement('BUTTON');
+
+        submitButton.classList.add('btn');
+        submitButton.id = 'btnSubmit';
+        submitButton.classList.add('btn-secondary');
+        submitButton.style.float = 'right';
+        submitButton.style.marginRight = '25px';
+        submitButton.style.marginBottom = '5px';
+        submitButton.innerText = 'Добавить';
+
+        editForm.appendChild(submitButton);
+
+        body.appendChild(editForm);
+        body.style.paddingBottom = '15px';
+
+        return body;
     }
 
     /*
        https://tech.yandex.ru/maps/jsbox/2.1/balloon_autopan
      */
-    closeBalloonFunc(addedComment){
-        this.saved = true;
-        this.placemark.balloon.close();
-    }
 
     ReCreateLayout() {
         let MyBalloonLayout = ymaps.templateLayoutFactory.createClass(
@@ -96,7 +211,7 @@ class yandexElementBuilder {
                 onSublayoutSizeChange: function () {
                     MyBalloonLayout.superclass.onSublayoutSizeChange.apply(this, arguments);
 
-                    if(!this._isElement(this._$element)) {
+                    if (!this._isElement(this._$element)) {
                         return;
                     }
 
@@ -166,92 +281,12 @@ class yandexElementBuilder {
                 }
             });
 
+        let body = this.BuildBalloonHtml();
 
+        var myFunc = this.closeBalloonFunc;
+        var oldThis = this;
 
-        let body = document.createElement('DIV');
-        let list = document.createElement('DIV');
-
-        list.style.minHeight = '100px';
-        list.style.maxHeight = '180px';
-        list.style.overflowY = 'auto';
-        for (let comment of this.history) {
-            let record = document.createElement('DIV');
-
-            record.innerHTML = '<b>' + comment.name + '</b> ' + comment.place + ' ' + comment.date + '<br/>';
-
-            record.appendChild(document.createTextNode(comment.comment));
-            list.appendChild(record);
-        }
-
-        body.appendChild(list);
-
-        let editForm = document.createElement('DIV');
-
-        editForm.innerHTML = '<h5 style="color: #C21F39">Ваш отзыв:</h5>';
-
-        let nameInput = document.createElement('INPUT');
-
-        nameInput.placeholder = 'Ваше имя';
-        nameInput.type = 'text';
-        editForm.appendChild(nameInput);
-
-        let placeInput = document.createElement('INPUT');
-
-        placeInput.placeholder = 'Укажите место';
-        placeInput.type = 'text';
-        editForm.appendChild(placeInput);
-
-        let commentInput = document.createElement('TEXTAREA');
-
-        commentInput.placeholder = 'Поделитесь впечатлениями';
-        editForm.appendChild(commentInput);
-
-        let submitButton = document.createElement('BUTTON');
-
-        submitButton.classList.add('btn');
-        submitButton.id = 'btnSubmit';
-        submitButton.classList.add('btn-secondary');
-        submitButton.style.float = 'right';
-        submitButton.style.marginRight = '25px';
-        submitButton.style.marginBottom = '5px';
-        submitButton.innerText = 'Добавить';
-/*
-        this.MapChangeAccepted(submitButton).then(()=>{
-            let newComment = new UserComment();
-
-            newComment.place = placeInput.value;
-            newComment.name = nameInput.value;
-            newComment.comment = commentInput.value;
-            newComment.address = this.address;
-
-            this.saved = true;
-
-            this.placemark.balloon.close();
-        });*/
-
-        submitButton.onclick = () => {
-            let newComment = new UserComment();
-
-            console.log('222');
-
-            newComment.place = placeInput.value;
-            newComment.name = nameInput.value;
-            newComment.comment = commentInput.value;
-            newComment.address = this.address;
-
-            console.log('222');
-
-            this.saved = true;
-
-            this.placemark.balloon.close();
-        };
-
-        editForm.appendChild(submitButton);
-
-        body.appendChild(editForm);
-        body.style.paddingBottom = '15px';
-
-        console.log(this.placemark, 2);
+        let name, place, comment;
 
         this.balloonLayout = MyBalloonLayout;
         let BalloonContentLayout = ymaps.templateLayoutFactory.createClass(
@@ -264,30 +299,23 @@ class yandexElementBuilder {
                     BalloonContentLayout.superclass.build.call(this);
                     // А затем выполняем дополнительные действия.
                     $('#btnSubmit').bind('click', ()=>{
-                        console.log(this.closeBalloonFunc);
-                        this.onSubmitClick(this.closeBalloonFunc);
+                        this.onSubmitClick(myFunc);
                     });
-                },
 
-                // Аналогично переопределяем функцию clear, чтобы снять
-                // прослушивание клика при удалении макета с карты.
-                clear: function () {
-                    // Выполняем действия в обратном порядке - сначала снимаем слушателя,
-                    // а потом вызываем метод clear родительского класса.
-                    $('#btnSubmit').unbind('click', this.onSubmitClick);
-                    BalloonContentLayout.superclass.clear.call(this);
+
                 },
 
                 onSubmitClick: function (closeAction) {
-                    console.log(closeAction);
                     let newComment = new UserComment();
 
-                    newComment.place = placeInput.value;
-                    newComment.name = nameInput.value;
-                    newComment.comment = commentInput.value;
+                    newComment.name = $('#nameInput').val();
+                    newComment.place = $('#placeInput').val();
+                    let comment = $('#commentInput').val();
+
+                    newComment.comment = comment;
                     newComment.address = this.address;
 
-                    closeAction(newComment);
+                    closeAction.call(oldThis, newComment);
                 }
             }
         );
@@ -295,13 +323,21 @@ class yandexElementBuilder {
         this.contentLayout = BalloonContentLayout;
     }
 
-    MapChangeAccepted( button ) {
-        return new Promise((resolve) => {
-            button.onclick = () => {
-                console.log("alert");
-                resolve();
-            };
-        });
+    closeBalloonFunc(addedComment){
+        this.saved= true;
+        addedComment.coords = this.geoCoord;
+        addedComment.address = this.address;
+        this.commentAdded(addedComment);
+        this.placemark.balloon.close();
+        this.history.push(addedComment);
+    }
+
+    get Saved() {
+        return this.saved;
+    }
+
+    set Saved(arg){
+        this.saved = arg;
     }
 }
 
