@@ -1,5 +1,5 @@
 import { UserComment } from './userComment';
-
+let cnt = 0;
 class yandexElementBuilder {
     constructor(objectManager, geoCoord, address, placeHistory, commentAddedCallback) {
         this.geoCoord = geoCoord;
@@ -13,54 +13,60 @@ class yandexElementBuilder {
         this.placemark = null;
         this.isNew = true;
         this.commentAdded = commentAddedCallback;
+
+        this.BuildClusterLayout(objectManager);
     }
 
-    ClosedWithoutSave(balloon) {
-        return new Promise((resolve)=>{
-            balloon.close = () => {
-                resolve(this.saved);
-            }
-        });
+    BuildClusterLayout(cluster){
+
+        cluster.createCluster = function(center, geoObjects){
+            let cluster = ymaps.Clusterer.prototype.createCluster.call(this, center, geoObjects);
+/*
+            let customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+                // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
+                '<h4 class=ballon_header>{{ properties.balloonContentHeader|raw }}</h4>' + '<label>'+cnt+'</label>' +
+                '<div class=ballon_body>' + '<label>'+cnt+'</label>' + '</div>' +
+                '<div class=ballon_footer>{{ properties.balloonContentFooter|raw }}</div>'
+            );
+            cnt ++;
+            console.log("i'm here");
+            cluster.properties.set({
+                preset: 'islands#redClusterIcons',
+                clusterDisableClickZoom: true,
+                clusterBalloonItemContentLayout: customItemContentLayout
+            });*/
+
+            return cluster;
+        }
     }
 
-    SetOldPlacemark(){
-        this.isNew = false;
-        this.saved = true;
-
-        this.ReCreateLayout();
-
-        this.placemark = new ymaps.Placemark ( this.geoCoord, {
-            balloonHeader: this.address,
-        }, {
-            balloonShadow: false,
-            balloonLayout: this.balloonLayout,
-            balloonContentLayout: this.contentLayout
-        } );
-
-        this.objectManager.add(this.placemark);
-
-        this.placemark.balloon.events.add('close', ()=> {
-            this.CloseCallback.call(this);
-        });
+    GetClusterContent() {
+        cnt ++;
+        return '<p>' + cnt + '</p>';
     }
 
     BuildPlaceMark( old ) {
+        if (old) {
+            this.isNew = false;
+            this.saved = true;
+        }
+
         this.ReCreateLayout();
 
         this.placemark = new ymaps.Placemark ( this.geoCoord, {
             balloonHeader: this.address,
+            balloonContentHeader: this.address,
+            balloonContentBody : this.BuildBalloonHtml(false).outerHTML
         }, {
             balloonShadow: false,
+
             balloonLayout: this.balloonLayout,
             balloonContentLayout: this.contentLayout
         } );
 
         this.objectManager.add(this.placemark);
 
-        if (old) {
-            this.isNew = false;
-            this.saved = true;
-        } else {
+        if (old !== true ) {
             this.placemark.balloon.open(this.geoCoord);
         }
 
@@ -77,11 +83,14 @@ class yandexElementBuilder {
 
             this.placemark = new ymaps.Placemark ( this.geoCoord, {
                 balloonHeader: this.address,
+                balloonContentHeader: this.address,
+                balloonContentBody : this.BuildBalloonHtml(false).outerHTML
             }, {
                 balloonShadow: false,
                 balloonLayout: this.balloonLayout,
-                balloonContentLayout: this.contentLayout
-            } );
+                balloonContentLayout: this.contentLayout,
+                clusterCaption: this.address
+            });
 
             // eslint-disable-next-line consistent-this
             this.placemark.balloon.events.add('close', ()=>{
@@ -91,19 +100,20 @@ class yandexElementBuilder {
             this.objectManager.add(this.placemark);
             this.isNew = false;
             this.saved = false;
-        }else{
-            if(this.isNew){
+
+        } else {
+            if (this.isNew){
                 this.objectManager.remove(this.placemark);
             }
         }
     }
 
-    BuildBalloonHtml(){
+    BuildBalloonHtml(input = true) {
         let body = document.createElement('DIV');
         let list = document.createElement('DIV');
 
         list.style.minHeight = '100px';
-        list.style.maxHeight = '180px';
+        list.style.maxHeight = '160px';
         list.style.overflowY = 'auto';
 
         for (let comment of this.history) {
@@ -119,7 +129,7 @@ class yandexElementBuilder {
 
         let editForm = document.createElement('DIV');
 
-        editForm.innerHTML = '<h5 style="color: #C21F39">Ваш отзыв:</h5>';
+        editForm.innerHTML = '<h5 style="color: #c23440">Ваш отзыв:</h5>';
 
         let nameInput = document.createElement('INPUT');
 
@@ -152,8 +162,8 @@ class yandexElementBuilder {
         submitButton.innerText = 'Добавить';
 
         editForm.appendChild(submitButton);
-
-        body.appendChild(editForm);
+        if(input)
+            body.appendChild(editForm);
         body.style.paddingBottom = '15px';
 
         return body;
@@ -286,9 +296,6 @@ class yandexElementBuilder {
         var myFunc = this.closeBalloonFunc;
         var oldThis = this;
 
-        let name, place, comment;
-
-        this.balloonLayout = MyBalloonLayout;
         let BalloonContentLayout = ymaps.templateLayoutFactory.createClass(
             '<label class="popover-title" style="background: #DA715B">$[properties.balloonHeader]</label>' +
             '<div class="popover-content">' + body.outerHTML + '</div>', {
@@ -298,21 +305,26 @@ class yandexElementBuilder {
                     // Сначала вызываем метод build родительского класса.
                     BalloonContentLayout.superclass.build.call(this);
                     // А затем выполняем дополнительные действия.
-                    $('#btnSubmit').bind('click', ()=>{
+                    $('#btnSubmit').unbind('click');
+                    $('#btnSubmit').one('click', ()=>{
                         this.onSubmitClick(myFunc);
                     });
-
-
                 },
-
+                clear: function () {
+                    // Выполняем действия в обратном порядке - сначала снимаем слушателя,
+                    // а потом вызываем метод clear родительского класса.
+                    $('#btnSubmit').unbind('click', ()=>{
+                        this.onSubmitClick(myFunc);
+                    });
+                    BalloonContentLayout.superclass.clear.call(this);
+                },
                 onSubmitClick: function (closeAction) {
                     let newComment = new UserComment();
 
                     newComment.name = $('#nameInput').val();
                     newComment.place = $('#placeInput').val();
-                    let comment = $('#commentInput').val();
 
-                    newComment.comment = comment;
+                    newComment.comment = $('#commentInput').val();
                     newComment.address = this.address;
 
                     closeAction.call(oldThis, newComment);
@@ -320,6 +332,7 @@ class yandexElementBuilder {
             }
         );
 
+        this.balloonLayout = MyBalloonLayout;
         this.contentLayout = BalloonContentLayout;
     }
 

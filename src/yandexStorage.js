@@ -6,6 +6,7 @@ let storage = new Map();
 class YandexStorage {
     constructor(objectManager) {
         this.objectManager = objectManager;
+
         loadFromStorage();
 
         for (let [key, place] of storage) {
@@ -20,9 +21,7 @@ class YandexStorage {
     }
 
     AddObject( coords, address ) {
-        let history = storage[address] ? storage[address] : [];
-
-        let yeb = new yandexElementBuilder(this.objectManager, coords, address, history, this.AppendComment);
+        let yeb = new yandexElementBuilder(this.objectManager, coords, address, [], this.AppendComment);
 
         yeb.BuildPlaceMark();
     }
@@ -30,7 +29,6 @@ class YandexStorage {
     AppendComment(elm) {
         if (storage.has(elm.address)) {
             let arr = storage.get(elm.address);
-
             arr.push(elm);
             storage.set(elm.address, arr);
         } else {
