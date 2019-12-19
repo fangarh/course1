@@ -1,57 +1,56 @@
 import { UserComment } from './userComment';
 import { yandexElementBuilder } from './ymapElementsBuilder'
 
-let storage = new Map();
-
 class YandexStorage {
     constructor(objectManager) {
         this.objectManager = objectManager;
+        this.storage = new Map();
 
-        loadFromStorage();
+        this.LoadFromStorage();
 
-        for (let [key, place] of storage) {
+        for (let [key, place] of this.storage) {
             let history = place;
             let address = key;
             let coords = place[0].coords;
 
-            let yeb = new yandexElementBuilder(this.objectManager, coords, address, history, this.AppendComment);
+            let yeb = new yandexElementBuilder(this.objectManager, coords, address, history, this.AppendComment, this);
 
             yeb.BuildPlaceMark(true);
         }
     }
 
     AddObject( coords, address ) {
-        let yeb = new yandexElementBuilder(this.objectManager, coords, address, [], this.AppendComment);
+        let yeb = new yandexElementBuilder(this.objectManager, coords, address, [], this.AppendComment, this);
 
         yeb.BuildPlaceMark();
     }
 
     AppendComment(elm) {
-        if (storage.has(elm.address)) {
-            let arr = storage.get(elm.address);
+        if (this.storage.has(elm.address)) {
+            let arr = this.storage.get(elm.address);
             arr.push(elm);
-            storage.set(elm.address, arr);
+            this.storage.set(elm.address, arr);
         } else {
-            storage.set(elm.address, [elm]);
+            this.storage.set(elm.address, [elm]);
         }
 
-        saveToStorage();
-    }
-}
-
-function loadFromStorage( ) {
-    if (localStorage.course1){
-        let objJson = JSON.parse(localStorage.course1);
-
-        storage = objJson.length > 0 ? new Map(objJson) : new Map();
-    } else {
-        storage = new Map();
+        this.SaveToStorage.call(this);
     }
 
-}
+    LoadFromStorage( ) {
+        if (localStorage.course1) {
+            let objJson = JSON.parse(localStorage.course1);
 
-function saveToStorage( ) {
-    localStorage.course1 = JSON.stringify(Array.from(storage.entries()));
+            this.storage = objJson.length > 0 ? new Map(objJson) : new Map();
+        } else {
+            this.storage = new Map();
+        }
+
+    }
+
+    SaveToStorage( ) {
+        localStorage.course1 = JSON.stringify(Array.from(this.storage.entries()));
+    }
 }
 
 export { YandexStorage };

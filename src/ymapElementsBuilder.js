@@ -1,11 +1,13 @@
 import { UserComment } from './userComment';
 let cnt = 0;
 class yandexElementBuilder {
-    constructor(objectManager, geoCoord, address, placeHistory, commentAddedCallback) {
+    constructor(objectManager, geoCoord, address, placeHistory, commentAddedCallback, storageContext) {
         this.geoCoord = geoCoord;
         this.saved = false;
         this.address = address;
         this.history = placeHistory;
+
+        this.storageContext = storageContext;
 
         this.objectManager = objectManager;
         this.balloonLayout = '';
@@ -13,36 +15,6 @@ class yandexElementBuilder {
         this.placemark = null;
         this.isNew = true;
         this.commentAdded = commentAddedCallback;
-
-        this.BuildClusterLayout(objectManager);
-    }
-
-    BuildClusterLayout(cluster){
-
-        cluster.createCluster = function(center, geoObjects){
-            let cluster = ymaps.Clusterer.prototype.createCluster.call(this, center, geoObjects);
-/*
-            let customItemContentLayout = ymaps.templateLayoutFactory.createClass(
-                // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
-                '<h4 class=ballon_header>{{ properties.balloonContentHeader|raw }}</h4>' + '<label>'+cnt+'</label>' +
-                '<div class=ballon_body>' + '<label>'+cnt+'</label>' + '</div>' +
-                '<div class=ballon_footer>{{ properties.balloonContentFooter|raw }}</div>'
-            );
-            cnt ++;
-            console.log("i'm here");
-            cluster.properties.set({
-                preset: 'islands#redClusterIcons',
-                clusterDisableClickZoom: true,
-                clusterBalloonItemContentLayout: customItemContentLayout
-            });*/
-
-            return cluster;
-        }
-    }
-
-    GetClusterContent() {
-        cnt ++;
-        return '<p>' + cnt + '</p>';
     }
 
     BuildPlaceMark( old ) {
@@ -340,7 +312,7 @@ class yandexElementBuilder {
         this.saved= true;
         addedComment.coords = this.geoCoord;
         addedComment.address = this.address;
-        this.commentAdded(addedComment);
+        this.commentAdded.call(this.storageContext, addedComment);
         this.placemark.balloon.close();
         this.history.push(addedComment);
     }

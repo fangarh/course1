@@ -24,15 +24,10 @@ function init() {
         searchControlProvider: 'yandex#search'
     });
 
-    var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
-        // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
-              '<h4 class=ballon_header>{{ properties.balloonContentHeader|raw }}</h4>' +
-              '<div class=ballon_body>{{ properties.balloonContent|raw }}</div>' +
-              '<div class=ballon_footer>{{ properties.balloonContentFooter|raw }}</div>'
-    );
-
-    cluster = new ymaps.Clusterer({clusterDisableClickZoom: true, preset: 'islands#redClusterIcons'
-       });
+    cluster = new ymaps.Clusterer ( {
+        clusterDisableClickZoom: true,
+        preset: 'islands#redClusterIcons'
+    });
 
     map.geoObjects.add(cluster);
 
