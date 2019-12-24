@@ -44,7 +44,7 @@ class YandexStorage{
         for(let [adr, comment] of this.comments)
             result.push(...comment);
 
-        return result;
+        return Array.from(result);
     }
 
     LoadFromStorage( ) {

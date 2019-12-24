@@ -65,7 +65,7 @@ class EditForm {
             let placemark = new ymaps.Placemark(newComment.coords, {
                 balloonContentHeader: header,
                 balloonContentBody: newComment.comment,
-                balloonContentFooter: newComment.Date,
+                balloonContentFooter: newComment.date,
                 hintContent: '<b>' + newComment.name + '</b> ' + newComment.place
             }, {
                 preset: 'islands#redIcon',
@@ -73,10 +73,8 @@ class EditForm {
                 openBalloonOnClick: false
             });
 
-            let addr = newComment.address;
-
             placemark.events.add('click', (e) => {
-                this.ShowAllPlaceData(addr, e.get('position'));
+                this.ShowAllPlaceData(newComment.address, e.get('position'));
             });
 
             this.cluster.add(placemark);
@@ -90,7 +88,7 @@ class EditForm {
         newComment.Place = this.place.value;
         newComment.Address = this.address;
         newComment.Comment = this.reviewContent.value;
-        newComment.Coords = this.coords;
+        newComment.coords = this.coords;
 
         this.ClearFormData();
 
@@ -101,11 +99,11 @@ class EditForm {
 
         let header = '<div>' + newComment.place + '</div><div class="address">' + this.address + '</div>';
 
-        let placemark = new ymaps.Placemark(this.coords, {
+        let placemark = new ymaps.Placemark(newComment.coords, {
             balloonContentHeader: header,
             balloonContentBody: newComment.comment,
-            balloonContentFooter: newComment.Date,
-            hintContent: '<b>' + newComment.Name + '</b> ' + newComment.Place
+            balloonContentFooter: newComment.date,
+            hintContent: '<b>' + newComment.name + '</b> ' + newComment.place
         }, {
             preset: 'islands#redIcon',
             iconColor: '#df6543',
@@ -115,10 +113,12 @@ class EditForm {
         let addr = this.address;
 
         placemark.events.add('click', (e) => {
+            this.coords = newComment.coords;
             this.ShowAllPlaceData(addr, e.get('position'));
         });
 
         this.cluster.add(placemark);
+        this.CloseForm();
     }
 
     ShowForm( pos, coords, address ) {
@@ -127,6 +127,7 @@ class EditForm {
         this.balloonForm.style.display = 'block';
 
         this.coords = coords;
+
         let x = pos[0];
         let y = pos[1];
 
@@ -169,7 +170,8 @@ class EditForm {
 
         for (let current of this.storage.AddressComments(address)) {
             this.emptyLabel.style.display = 'none';
-            this.coords = current.Coords;
+
+            this.coords = current.coords;
 
             this.oldComment.innerHTML += userComm( { userDataComment: current } );
 

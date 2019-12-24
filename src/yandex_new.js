@@ -40,9 +40,6 @@ function init() {
     map.geoObjects.add(clusterer);
     let storage = new YandexStorage();
     let form = new EditForm(map, clusterer, storage);
-
-    form.RestoreFromStorage();
-
     map.events.add('click', e => {
         let coords = e.get('coords');
         let position = e.get('position');
@@ -57,4 +54,6 @@ function init() {
     map.events.add('balloonopen', () => {
         form.CloseForm();
     });
+
+    form.RestoreFromStorage();
 }
