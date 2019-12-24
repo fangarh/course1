@@ -19,6 +19,10 @@ class UserComment {
         return this.name;
     }
 
+    get Date() {
+        return this.date;
+    }
+
     get Place() {
         return this.place;
     }
@@ -49,6 +53,10 @@ class UserComment {
 
     set Coords(val) {
         this.coords = val;
+    }
+
+    set Address(val) {
+        this.address = val;
     }
 
     set Addres(val) {

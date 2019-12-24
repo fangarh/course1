@@ -1,0 +1,51 @@
+<style>
+    .editForm{
+        font-size: 12px;
+        position: absolute;
+        background-color: #fff;
+        z-index: 1000;
+        border-radius: 5px;
+        display: none;
+    }
+    .editHead{
+        border-radius: 5px;
+        display: inline-block;
+        font: normal normal normal 14px Arial;
+        background: #ff8563;
+    }
+    .editInput{
+        height: 20px;
+        border-radius: 10px;
+        outline: none;
+        border: 3px solid #ccc;
+        width: 95%;
+        padding: 0 5px;
+    }
+
+    .commitBtn{
+        border: 3px solid #ccc;
+        border-radius: 7px;
+    }
+</style>
+
+<div id="balloonForm" class="editForm">
+    <div id="balloonForm_head" class="editHead">
+        <i style="display: inline-block; font: normal normal normal 14px Arial;"></i>
+        <span id="addressList" style="width: 260px;  display: inline-table;"></span>
+        <i style="display: inline-block; font: normal normal normal 14px Arial ;"><img id="closeBtn" src="http://just4fun.3nx.ru/templates/cs/images/folder_lock_new.gif"/></i>
+    </div>
+    <div id="oldCommentList" style="padding: 5px 5px 5px 10px; height: 20%; overflow-y: auto;">
+        <span id="emptyLabel">Отзывов пока нет...</span>
+    </div>
+    <div style="padding: 5px 5px 5px 10px;">ВАШ ОТЗЫВ</div>
+    <div >
+        <input class="editInput" placeholder="Ваше имя" type="text" id="username">
+    </div>
+    <div style="">
+        <input class="editInput" placeholder="Укажите место" type="text" id="place">
+    </div>
+    <div >
+        <textarea class="editInput" style="height: 80px;" rows="4" placeholder="Поделитесь впечатлениями" id="review_content"></textarea>
+    </div>
+    <button class="commitBtn" id="commitBtn">Добавить</button>
+</div>

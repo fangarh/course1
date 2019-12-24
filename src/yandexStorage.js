@@ -1,55 +1,41 @@
-import { UserComment } from './userComment';
-import { yandexElementBuilder } from './ymapElementsBuilder'
-
-class YandexStorage {
-    constructor(objectManager) {
-        this.objectManager = objectManager;
-        this.storage = new Map();
-
-        this.LoadFromStorage();
-
-        for (let [key, place] of this.storage) {
-            let history = place;
-            let address = key;
-            let coords = place[0].coords;
-
-            let yeb = new yandexElementBuilder(this.objectManager, coords, address, history, this.AppendComment, this);
-
-            yeb.BuildPlaceMark(true);
-        }
+class YandexStorage{
+    constructor() {
+        this.comments = new Map();
     }
 
-    AddObject( coords, address ) {
-        let yeb = new yandexElementBuilder(this.objectManager, coords, address, [], this.AppendComment, this);
+    AddComment( comment ) {
+        if (this.comments.has( comment.address )) {
 
-        yeb.BuildPlaceMark();
-    }
+            let arr = this.comments.get( comment.address );
 
-    AppendComment(elm) {
-        if (this.storage.has(elm.address)) {
-            let arr = this.storage.get(elm.address);
-            arr.push(elm);
-            this.storage.set(elm.address, arr);
+            arr.push(comment);
+
+            this.comments.set(comment.address, arr);
         } else {
-            this.storage.set(elm.address, [elm]);
+            this.comments.set(comment.address, [comment]);
         }
 
-        this.SaveToStorage.call(this);
+        /*this.SaveToStorage.call(this);*/
     }
 
-    LoadFromStorage( ) {
-        if (localStorage.course1) {
-            let objJson = JSON.parse(localStorage.course1);
+    get Comments() {
+        return this.comments;
+    }
 
-            this.storage = objJson.length > 0 ? new Map(objJson) : new Map();
-        } else {
-            this.storage = new Map();
+    set Comments(val) {
+        this.comments = val;
+    }
+
+    AddressComments( address ) {
+        let result = [];
+
+        for ( let [adr, comment] of this.comments ) {
+            if ( adr == address ){
+                result.push(comment);
+            }
         }
-
-    }
-
-    SaveToStorage( ) {
-        localStorage.course1 = JSON.stringify(Array.from(this.storage.entries()));
+console.log(result);
+        return result;
     }
 }
 
