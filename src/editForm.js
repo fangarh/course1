@@ -58,6 +58,31 @@ class EditForm {
         });
     }
 
+    RestoreFromStorage() {
+        for (let newComment of this.storage.AllComments()) {
+            let header = '<div>' + newComment.place + '</div><div class="address">' + newComment.address + '</div>';
+
+            let placemark = new ymaps.Placemark(newComment.coords, {
+                balloonContentHeader: header,
+                balloonContentBody: newComment.Comment,
+                balloonContentFooter: newComment.Date,
+                hintContent: '<b>' + newComment.Name + '</b> ' + newComment.Place
+            }, {
+                preset: 'islands#redIcon',
+                iconColor: '#df6543',
+                openBalloonOnClick: false
+            });
+
+            let addr = newComment.address;
+
+            placemark.events.add('click', (e) => {
+                this.ShowAllPlaceData(addr, e.get('position'));
+            });
+
+            this.cluster.add(placemark);
+        }
+    }
+
     AddComment() {
         let newComment = new UserComment();
 
