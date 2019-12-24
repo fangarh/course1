@@ -174,7 +174,6 @@ class EditForm {
             this.coords = current.coords;
 
             this.oldComment.innerHTML += userComm( { userDataComment: current } );
-
         }
 
         if (this.oldComment.children.length > 1) {
