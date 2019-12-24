@@ -52,12 +52,12 @@ class EditForm {
         newComment.Comment = this.reviewContent.value;
         newComment.Coords = this.coords;
 
+        this.ClearFormData();
+
         this.storage.AddComment(newComment);
 
         this.emptyLabel.style.display = 'none';
         this.oldComment.innerHTML += userComm( { userDataComment: newComment } );
-
-        this.ClearFormData();
 
         let header = '<div class="where">' + newComment.place + '</div><div class="address">' + this.address + '</div>';
 
@@ -85,7 +85,7 @@ class EditForm {
         this.map.balloon.close();
         this.balloonForm.style.zIndex = 0;
         this.balloonForm.style.display = 'block';
-        this.address = address;
+
         this.coords = coords;
         let x = pos[0];
         let y = pos[1];
@@ -117,20 +117,18 @@ class EditForm {
     }
 
     ClearPlaceData() {
-        this.emptyLabel.style.display = 'block';
-
-        while (this.oldComment.children.length > 1) {
-            this.oldComment.removeChild(this.oldComment.lastChild);
-        }
+        this.oldComment.innerHTML = '<span id="emptyLabel" style="display: block">Отзывов пока нет...</span>';
+        this.emptyLabel = document.getElementById('emptyLabel');
     }
 
     ShowAllPlaceData(address, position) {
         this.ClearFormData();
-       // this.ClearPlaceData();
+        this.ClearPlaceData();
         this.address = address;
         this.addressHead.textContent = address;
-
+console.log(address);
         for (let current of this.storage.AddressComments(address)) {
+            this.emptyLabel.style.display = 'none';
             this.coords = current.Coords;
 
             this.oldComment.innerHTML += userComm( { userDataComment: current } );
@@ -139,8 +137,7 @@ class EditForm {
 
         if (this.oldComment.children.length > 1) {
             this.emptyLabel.style.display = 'none';
-            this.ShowForm(position);
-            console.log(this.content);
+            this.ShowForm(position, this.coords, this.address);
         }
     }
 
