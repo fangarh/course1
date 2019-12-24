@@ -41,6 +41,8 @@ function init() {
     let storage = new YandexStorage();
     let form = new EditForm(map, clusterer, storage);
 
+    storage.RestoreFromStorage(clusterer, form.ShowAllPlaceData);
+
     map.events.add('click', e => {
         let coords = e.get('coords');
         let position = e.get('position');

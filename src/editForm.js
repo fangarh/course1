@@ -41,6 +41,21 @@ class EditForm {
             });
         });
         this.commitBtn.addEventListener('click', () => { this.AddComment.call(this); });
+
+        let ymap = document.getElementById('ymap');
+
+        ymap.addEventListener('click', e => {
+            let target = e.target;
+
+            if (target.className != 'address') {
+                return;
+            }
+            this.map.balloon.close();
+            const x = e.clientX;
+            const y = e.clientY;
+
+            this.ShowAllPlaceData(target.textContent, [x, y]);
+        });
     }
 
     AddComment() {
@@ -59,11 +74,11 @@ class EditForm {
         this.emptyLabel.style.display = 'none';
         this.oldComment.innerHTML += userComm( { userDataComment: newComment } );
 
-        let header = '<div class="where">' + newComment.place + '</div><div class="address">' + this.address + '</div>';
+        let header = '<div>' + newComment.place + '</div><div class="address">' + this.address + '</div>';
 
         let placemark = new ymaps.Placemark(this.coords, {
             balloonContentHeader: header,
-            balloonContentBody: this.reviewContent.value,
+            balloonContentBody: newComment.Comment,
             balloonContentFooter: newComment.Date,
             hintContent: '<b>' + newComment.Name + '</b> ' + newComment.Place
         }, {
@@ -126,13 +141,13 @@ class EditForm {
         this.ClearPlaceData();
         this.address = address;
         this.addressHead.textContent = address;
-console.log(address);
+
         for (let current of this.storage.AddressComments(address)) {
             this.emptyLabel.style.display = 'none';
             this.coords = current.Coords;
 
             this.oldComment.innerHTML += userComm( { userDataComment: current } );
-            console.log(userComm( { userDataComment: current } ));
+
         }
 
         if (this.oldComment.children.length > 1) {
