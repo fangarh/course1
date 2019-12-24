@@ -47,8 +47,8 @@ class UserComment {
         this.place = val;
     }
 
-    set Comment(comment) {
-        this.comment = comment;
+    set Comment(com) {
+        this.comment = com;
     }
 
     set Coords(val) {

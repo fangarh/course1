@@ -64,9 +64,9 @@ class EditForm {
 
             let placemark = new ymaps.Placemark(newComment.coords, {
                 balloonContentHeader: header,
-                balloonContentBody: newComment.Comment,
+                balloonContentBody: newComment.comment,
                 balloonContentFooter: newComment.Date,
-                hintContent: '<b>' + newComment.Name + '</b> ' + newComment.Place
+                hintContent: '<b>' + newComment.name + '</b> ' + newComment.place
             }, {
                 preset: 'islands#redIcon',
                 iconColor: '#df6543',
@@ -103,7 +103,7 @@ class EditForm {
 
         let placemark = new ymaps.Placemark(this.coords, {
             balloonContentHeader: header,
-            balloonContentBody: newComment.Comment,
+            balloonContentBody: newComment.comment,
             balloonContentFooter: newComment.Date,
             hintContent: '<b>' + newComment.Name + '</b> ' + newComment.Place
         }, {
