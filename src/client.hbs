@@ -2,13 +2,45 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link href="https://yandex.st/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
     <title>{{htmlWebpackPlugin.options.title}}</title>
 </head>
 <body>
-
-<b>client</b>
-
+    <style>
+        .lbi{
+            position: relative;
+            display: block;
+            margin-bottom: -1px;
+        }
+    </style>
+<div id="chatForm" style="display: none;">
+    <div class="row" style="height: 95vh;">
+        <div class="col-3" style="background-color: sienna;">
+            <div id="authData" style="padding-bottom: 40px; padding-top: 20px; padding-left: 10px;">
+               
+            </div>
+            <div>
+                <b>Участники:</b>
+                <div>
+                    <ul id="users">
+                        <li class="lbi">sss</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            {{> "./chatFace.hbs"}}
+        </div>
+    </div>
+</div>
+<div id="authForm" style="display: block; padding-top:10%; padding-left: 40%">
+    <label style="padding-right:20px">Сервер</label><input id="server" value="loclahost"><br><br>
+    <label style="padding-right:20px">Порт</label><input id="port" value="9090"><br><br>
+    <label style="padding-right:20px">Ник</label><input id="nickName" ><br><br>
+    <label style="padding-right:20px">Имя</label><input id="userFullName" ><br><br>
+    <button id="btnEnterChat" class="btn btn-danger">Войти</button>
+</div>
 </body>
 </html>
