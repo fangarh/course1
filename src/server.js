@@ -1,54 +1,94 @@
-document.addEventListener('DOMContentLoaded', onPageLoad);
+/* eslint-disable no-console */
+/* eslint-disable guard-for-in */
 
-const startServerBtn = document.getElementById('startSrv');
-const portInput = document.getElementById('port');
-const addressInput = document.getElementById('address');
+var WebSocketServer = new require('ws');
 
-startServerBtn.addEventListener('click', startServer);
+// подключённые клиенты
+var clients = {};
+var clientProp = new Map();
 
-function onPageLoad() {
-    console.log('server inited');
+// WebSocket-сервер на порту 8081
+var webSocketServer = new WebSocketServer.Server ({ port: 9090 } );
+
+webSocketServer.on('connection', function(ws) {
+    var id = Math.random();    
+    
+    clients[id] = ws;
+
+    console.log("новое соединение " + id);
+
+    ws.on('message', function(message) {
+        var msg = JSON.parse(message);
+        
+        if ( msg.type == 'command' ) {
+            ParseCommand(id, msg)
+        } else {
+            for ( var key in clients ) {
+                clients[key].send(message);
+            }
+        }
+    });
+
+    ws.on('close', function() {
+        console.log('соединение закрыто ' + id);
+        clientProp.delete(id);
+        delete clients[id];
+
+        for ( var key in clients ) {            
+            clients[key].send(JSON.stringify({
+                type: 'command',
+                textData: 'updateUser',
+                systemData: CollectUsers()
+            }));
+        }
+    });
+});
+
+function ParseCommand (id, message) {
+    console.log(id, message.textData); 
+    if (message.textData == 'UserLoggedOn') {
+        clientProp.set(id, message.user);
+
+        for ( var key in clients ) {
+            console.log(key);
+            clients[key].send(JSON.stringify({
+                type: 'command',
+                textData: 'updateUser',
+                systemData: CollectUsers()
+            }));
+        }
+    }
+
+    if (message.textData == 'UserImageUpdated') {
+        clientProp.set(id, message.user);
+        
+        for ( var key in clients ) {            
+            clients[key].send(JSON.stringify({
+                type: 'command',
+                textData: 'updateUser',
+                systemData: CollectUsers()
+            }));
+        }
+    }
+
+    if (message.textData == 'UserImageReloaded') {
+        clientProp.set(id, message.user);
+        
+        for ( var key in clients ) {            
+            clients[key].send(JSON.stringify({
+                type: 'command',
+                textData: 'updateUserImage',
+                user: clientProp.get(id)
+            }));
+        }
+    }
 }
 
-function startServer() { 
-    console.log('Server started on: ' + addressInput.value + ':' + portInput.value);
-}
+function CollectUsers() {
+    let result = [];
 
+    for (let [, user] of clientProp)
+        result.push(user);
 
-//////////////////////// ТЕСТ WS / WEBSOCKET
-
-const http = require('http');
-const ws = require('ws');
-
-const wss = new ws.Server({noServer: true});
-
-function accept(req, res) {
-  // все входящие запросы должны использовать websockets
-  if (!req.headers.upgrade || req.headers.upgrade.toLowerCase() != 'websocket') {
-    res.end();
-    return;
-  }
-
-  // может быть заголовок Connection: keep-alive, Upgrade
-  if (!req.headers.connection.match(/\bupgrade\b/i)) {
-    res.end();
-    return;
-  }
-
-  wss.handleUpgrade(req, req.socket, Buffer.alloc(0), onConnect);
-}
-
-function onConnect(ws) {
-  ws.on('message', function (message) {
-    let name = message.match(/([\p{Alpha}\p{M}\p{Nd}\p{Pc}\p{Join_C}]+)$/gu) || "Гость";
-    ws.send(`Привет с сервера, ${name}!`);
-
-    setTimeout(() => ws.close(1000, "Пока!"), 5000);
-  });
-}
-
-if (!module.parent) {
-  http.createServer(accept).listen(8080);
-} else {
-  exports.accept = accept;
+    return Array.from(result);
 }

@@ -1,3 +1,5 @@
+'use strict';
+
 class ChatUser {
     constructor(nick, name, logo) {
         this.nick = nick;
@@ -24,6 +26,10 @@ class ChatUser {
                 resolve();
             }) 
         });
+    }
+
+    LoadDropLogo(file) {
+        return new Promise((resolve) => {});
     }
 }
 
